@@ -1,4 +1,5 @@
 import CategoryCard from "../components/CategoryCard";
+import NuevaColeccionSection from "../sections/NuevaColeccionSection";
 
 const categorias = [
   { nombre: "VESTIDOS", img: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop", to: "/vestidos" },
@@ -17,14 +18,8 @@ const destacados = [
 export default function Home() {
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section id="nueva-coleccion" className="h-[70vh] sm:h-[80vh] flex flex-col items-center justify-center text-center bg-bone px-6">
-        <h2 className="text-3xl tracking-[0.2em] font-light mb-4">NUEVA COLECCIÓN</h2>
-        <p className="text-lg mb-6">Descubre nuestras nuevas prendas</p>
-        <a href="#destacados" className="border border-ink px-8 py-3 uppercase tracking-[0.2em] text-sm hover:bg-ink hover:text-white transition">
-          Ver Colección
-        </a>
-      </section>
+      {/* Hero (como sección reutilizable) */}
+      <NuevaColeccionSection withId />
 
       {/* Categorías */}
       <section id="categorias" className="py-16 px-6">
@@ -42,8 +37,11 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {destacados.map((p) => (
             <div key={p.nombre} className="text-center group">
-              <div className="img-wrap h-80 mb-4">
-                <div className="img-zoom" style={{ backgroundImage: `url(${p.img})` }} />
+              <div className="img-wrap h-80 mb-4 overflow-hidden rounded-2xl">
+                <div
+                  className="img-zoom h-full w-full bg-center bg-cover transform group-hover:scale-105 transition-transform duration-500"
+                  style={{ backgroundImage: `url(${p.img})` }}
+                />
               </div>
               <h4 className="font-medium text-base mb-1">{p.nombre}</h4>
               <p className="text-sm text-gray-600">{p.precio}</p>
@@ -57,7 +55,8 @@ export default function Home() {
         <div className="max-w-2xl mx-auto">
           <h2 className="text-2xl tracking-[0.3em] font-light mb-6">NUESTRA FILOSOFÍA</h2>
           <p className="text-base leading-8">
-            En La Coquetería mezclamos prendas nuevas y recicladas para crear looks en tendencia. No sólo vendemos ropa, sino que también compramos tu ropa para darle una segunda vida.
+            En La Coquetería mezclamos prendas nuevas y recicladas para crear looks en tendencia.
+            No sólo vendemos ropa, sino que también compramos tu ropa para darle una segunda vida.
           </p>
         </div>
       </section>

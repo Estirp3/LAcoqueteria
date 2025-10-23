@@ -1,7 +1,8 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
+// ¡Ojo con mayúsculas! Debe coincidir EXACTO con el nombre del repo
 export default defineConfig({
+  base: "/LAcoqueteria/",
   plugins: [react()],
-})
+});
