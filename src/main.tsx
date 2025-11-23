@@ -1,24 +1,33 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { HashRouter, Routes, Route } from "react-router-dom";
-import "./styles/globals.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./index.css";
+import Layout from "./pages/Layout";
+import Home from "./pages/Home";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import NuevaColeccion from "./pages/NuevaColeccion";
+import CategoryPage from "./pages/CategoryPage";
+import { DataProvider } from "./context/DataContext";
 
-import { Layout, Home, Vestidos, Pantalones, Tops, Faldas, NuevaColeccion } from "./pages";
-
+import ThemeController from "./components/ThemeController";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/vestidos" element={<Vestidos />} />
-          <Route path="/pantalones" element={<Pantalones />} />
-          <Route path="/tops" element={<Tops />} />
-          <Route path="/faldas" element={<Faldas />} />
-          <Route path="/nueva-coleccion" element={<NuevaColeccion />} />
-        </Route>
-      </Routes>
-    </HashRouter>
+    <DataProvider>
+      <ThemeController />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="nueva-coleccion" element={<NuevaColeccion />} />
+            <Route path="login" element={<Login />} />
+            <Route path="admin" element={<Admin />} />
+            {/* Ruta dinámica para categorías (ej: /vestidos, /pantalones) */}
+            <Route path=":categoryName" element={<CategoryPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </DataProvider>
   </React.StrictMode>
 );

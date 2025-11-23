@@ -1,17 +1,23 @@
+import { useParams } from "react-router-dom";
 import { useMemo, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import ProductFilters from "../components/ProductFilters";
 import { useData } from "../context/DataContext";
 
-export default function NuevaColeccion() {
-    const { featuredProducts, appSettings } = useData();
+export default function CategoryPage() {
+    const { categoryName } = useParams<{ categoryName: string }>();
+    const { allProducts, appSettings } = useData();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedColor, setSelectedColor] = useState("");
     const [selectedSize, setSelectedSize] = useState("");
 
+    const currentCategoryName = categoryName?.toUpperCase().replace(/-/g, " ");
+
     const filteredProducts = useMemo(() => {
-        let filtered = [...featuredProducts];
+        let filtered = allProducts.filter(
+            (p) => p.category.toUpperCase() === currentCategoryName
+        );
 
         // Búsqueda mejorada por palabras clave
         if (searchQuery.trim()) {
@@ -35,21 +41,18 @@ export default function NuevaColeccion() {
             );
         }
 
-        // Los productos se muestran en el orden que fueron creados
+        // Los productos se muestran en el orden que fueron creados (sin ordenamiento)
         return filtered;
-    }, [featuredProducts, searchQuery, selectedColor, selectedSize]);
+    }, [allProducts, currentCategoryName, searchQuery, selectedColor, selectedSize]);
 
     return (
         <div className="pt-20 pb-16 px-3 min-h-screen bg-[#FDFBF7]">
             <div className="max-w-full mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-2xl sm:text-3xl font-light tracking-[0.15em] mb-2 uppercase">
-                        Nueva Colección
+                        {currentCategoryName || "CATEGORÍA"}
                     </h1>
                     <div className="w-20 h-0.5 bg-black mx-auto" />
-                    <p className="mt-3 text-gray-600 max-w-2xl mx-auto font-light text-sm">
-                        Descubre nuestras últimas incorporaciones. Diseños exclusivos pensados para ti.
-                    </p>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-5">
@@ -66,7 +69,7 @@ export default function NuevaColeccion() {
                         {filteredProducts.length > 0 ? (
                             <>
                                 <p className="text-xs text-gray-600 mb-5">
-                                    {filteredProducts.length} producto{filteredProducts.length !== 1 ? "s" : ""} destacado{filteredProducts.length !== 1 ? "s" : ""}
+                                    {filteredProducts.length} producto{filteredProducts.length !== 1 ? "s" : ""}
                                 </p>
                                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     {filteredProducts.map((product) => (

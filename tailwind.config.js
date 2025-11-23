@@ -1,12 +1,30 @@
-    export default {
-    content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-    theme: {
-        extend: {
-        fontFamily: { sans: ["Montserrat", "ui-sans-serif", "system-ui", "Arial"] },
-        colors: { ink: "#333333", bone: "#f9f9f9", line: "#f0f0f0", accent: "#d8c3a5" },
-        borderRadius: { xl: "0.75rem", "2xl": "1rem" },
-        },
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        ink: 'var(--color-ink)',
+        paper: 'var(--color-paper)',
+        accent: 'var(--color-accent)',
+        line: 'var(--color-line)',
+      },
+      fontFamily: {
+        sans: ['Outfit', 'sans-serif'],
+      },
+      letterSpacing: {
+        widest: '0.2em',
+      },
+      backgroundColor: {
+        'paper': 'var(--color-paper)',
+      },
+      textColor: {
+        'ink': 'var(--color-ink)',
+      }
     },
-    
-    plugins: [],
-    };
+  },
+  plugins: [],
+}

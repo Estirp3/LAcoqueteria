@@ -1,38 +1,34 @@
-import bannerT from "../assets/Banner/bannerT.png";
-import { Link } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
+import { useData } from "../context/DataContext";
 
-interface Props {
-    withId?: boolean;
-}
+export default function NuevaColeccionSection() {
+    const { featuredProducts } = useData();
 
-export default function NuevaColeccionSection({ withId = false }: Props) {
+    // Mostrar solo los primeros 4 productos destacados en la home
+    const displayProducts = featuredProducts.slice(0, 4);
+
     return (
-        <section
-            id={withId ? "nueva-coleccion" : undefined}
-            className="relative h-[70vh] sm:h-[80vh] flex flex-col items-center justify-center text-center text-white px-6 overflow-hidden"
-            style={{
-                backgroundImage: `url(${bannerT})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-            }}
-        >
-            {/* Overlay semitransparente para mejorar legibilidad */}
-            <div className="absolute inset-0 bg-black/40" />
+        <section id="nuevos-ingresos" className="py-20 px-4 bg-white">
+            <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-light tracking-[0.2em] mb-4">
+                        NUEVOS INGRESOS
+                    </h2>
+                    <div className="w-24 h-0.5 bg-black mx-auto" />
+                </div>
 
-            {/* Contenido */}
-            <div className="relative z-10">
-                <h2 className="text-3xl sm:text-4xl tracking-[0.2em] font-light mb-4">
-                    NUEVA COLECCIÓN
-                </h2>
-                <p className="text-lg mb-6">Descubre nuestras nuevas prendas</p>
-                <a>
-                    <Link
-                        to="/nueva-coleccion"
-                        className="border border-sand px-8 py-3 uppercase tracking-[0.2em] text-sm hover:bg-sand hover:text-white transition"
-                    >
-                        Ver Colección
-                    </Link>
-                </a>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {displayProducts.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            id={product.id || 0}
+                            nombre={product.nombre}
+                            precio={product.precio}
+                            img={product.img}
+                            category={product.category}
+                        />
+                    ))}
+                </div>
             </div>
         </section>
     );

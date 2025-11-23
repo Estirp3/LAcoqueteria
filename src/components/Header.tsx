@@ -1,161 +1,137 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import logoUrl from "../assets/images/la-coqueteria-logo.svg";
-
-type MenuItem =
-  | { label: "NUEVA COLECCIÓN"; type: "special" }
-  | { label: string; to: string; type: "route" }
-  | { label: string; href: `#${string}`; type: "anchor" };
-
-const MENU: MenuItem[] = [
-  { label: "NUEVA COLECCIÓN", type: "special" },
-  { label: "VESTIDOS", to: "/vestidos", type: "route" },
-  { label: "PANTALONES", to: "/pantalones", type: "route" },
-  { label: "TOPS", to: "/tops", type: "route" },
-  { label: "FALDAS", to: "/faldas", type: "route" },
-];
+import { useData } from "../context/DataContext";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
+  const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+  const { categories } = useData();
 
   useEffect(() => {
     const onScroll = () => {
-      const y = window.scrollY;
-      setHidden(y > lastY.current && y > 80);
-      lastY.current = y;
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 50) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+
+      setScrolled(currentScrollY > 50);
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
+
+    window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [lastScrollY]);
 
   const scrollToId = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const onClickAnchor = (id: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    scrollToId(id);
-    setOpen(false);
-  };
-
-  // NUEVA COLECCIÓN: si estás en Home, scrollea; si no, navega a /nueva-coleccion
   const goNuevaColeccion = (e: React.MouseEvent) => {
     e.preventDefault();
     if (location.pathname === "/") {
-      scrollToId("nueva-coleccion");
+      scrollToId("nuevos-ingresos");
     } else {
       navigate("/nueva-coleccion");
     }
-    setOpen(false);
   };
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 transition-transform duration-300 ${hidden ? "-translate-y-full" : "translate-y-0"
-        } bg-white/90 backdrop-blur border-b border-line`}
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled || open ? "bg-white shadow-sm py-1" : "bg-transparent py-2"
+        } ${visible ? "translate-y-0" : "-translate-y-full"
+        } bg-white/95 backdrop-blur border-b border-line`}
     >
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="h-[72px] flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="h-[65px] flex items-center justify-between">
           <Link to="/" aria-label="Ir a inicio" onClick={() => setOpen(false)}>
-            <img src={logoUrl} alt="La Coquetería" className="w-[160px] sm:w-[200px] h-auto" />
+            <img src={logoUrl} alt="La Coquetería" className="w-[130px] sm:w-[150px] h-auto" />
           </Link>
 
+          {/* Desktop Menu */}
           <nav className="hidden md:block">
-            <ul className="flex items-center gap-6 text-[12px] tracking-[0.2em]">
-              {MENU.map((item) => (
-                <li key={item.label}>
-                  {item.type === "route" && (
-                    <NavLink
-                      to={item.to}
-                      className="hover:text-accent transition-colors"
-                    >
-                      {item.label}
-                    </NavLink>
-                  )}
+            <ul className="flex items-center gap-6 text-[11px] tracking-[0.15em]">
+              {!categories.some(c => c.nombre.toUpperCase() === "NUEVA COLECCIÓN") && (
+                <li>
+                  <a
+                    href={location.pathname === "/" ? "#nuevos-ingresos" : "/nueva-coleccion"}
+                    onClick={goNuevaColeccion}
+                    className="hover:text-accent transition-colors cursor-pointer font-medium"
+                  >
+                    NUEVA COLECCIÓN
+                  </a>
+                </li>
+              )}
 
-                  {item.type === "anchor" && (
-                    <a
-                      href={item.href}
-                      onClick={onClickAnchor(item.href.replace("#", ""))}
-                      className="hover:text-accent transition-colors"
-                    >
-                      {item.label}
-                    </a>
-                  )}
-
-                  {item.type === "special" && (
-                    <a
-                      href={location.pathname === "/" ? "#nueva-coleccion" : "/nueva-coleccion"}
-                      onClick={goNuevaColeccion}
-                      className="hover:text-accent transition-colors"
-                    >
-                      {item.label}
-                    </a>
-                  )}
+              {categories.map((cat) => (
+                <li key={cat.id}>
+                  <NavLink
+                    to={cat.to || `/${cat.nombre.toLowerCase()}`}
+                    className="hover:text-accent transition-colors uppercase font-medium"
+                  >
+                    {cat.nombre}
+                  </NavLink>
                 </li>
               ))}
             </ul>
           </nav>
 
+          {/* Mobile Toggle */}
           <button
-            className="md:hidden p-2"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Abrir menú"
-            aria-expanded={open}
-            aria-controls="mobile-menu"
+            onClick={() => setOpen(!open)}
+            className="md:hidden p-2 text-ink"
+            aria-label="Menú"
           >
-            <div className={`w-6 h-[2px] bg-ink mb-1 transition ${open ? "rotate-45 translate-y-1" : ""}`} />
-            <div className={`w-6 h-[2px] bg-ink mb-1 transition ${open ? "opacity-0" : ""}`} />
-            <div className={`w-6 h-[2px] bg-ink transition ${open ? "-rotate-45 -translate-y-1" : ""}`} />
+            <div className="space-y-1.5">
+              <span className={`block w-5 h-0.5 bg-current transition-transform ${open ? "rotate-45 translate-y-2" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-current transition-opacity ${open ? "opacity-0" : ""}`} />
+              <span className={`block w-5 h-0.5 bg-current transition-transform ${open ? "-rotate-45 -translate-y-2" : ""}`} />
+            </div>
           </button>
         </div>
+      </div>
 
-        <div
-          id="mobile-menu"
-          className={`md:hidden overflow-hidden transition-[max-height] duration-300 ${open ? "max-h-96" : "max-h-0"
-            }`}
-        >
-          <ul className="pb-4 flex flex-col gap-3 text-[12px] tracking-[0.2em]">
-            {MENU.map((item) => (
-              <li key={item.label}>
-                {item.type === "route" && (
-                  <NavLink
-                    to={item.to}
-                    onClick={() => setOpen(false)}
-                    className="block py-2 hover:text-accent"
-                  >
-                    {item.label}
-                  </NavLink>
-                )}
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden absolute top-full left-0 w-full bg-white border-b border-line shadow-lg transition-all duration-300 overflow-hidden ${open ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+          }`}
+      >
+        <ul className="flex flex-col p-5 gap-3 text-sm tracking-[0.15em] text-center">
+          {!categories.some(c => c.nombre.toUpperCase() === "NUEVA COLECCIÓN") && (
+            <li>
+              <a
+                href={location.pathname === "/" ? "#nuevos-ingresos" : "/nueva-coleccion"}
+                onClick={(e) => {
+                  goNuevaColeccion(e);
+                  setOpen(false);
+                }}
+                className="block py-2 hover:text-accent font-medium"
+              >
+                NUEVA COLECCIÓN
+              </a>
+            </li>
+          )}
 
-                {item.type === "anchor" && (
-                  <a
-                    href={item.href}
-                    onClick={onClickAnchor(item.href.replace("#", ""))}
-                    className="block py-2 hover:text-accent"
-                  >
-                    {item.label}
-                  </a>
-                )}
-
-                {item.type === "special" && (
-                  <a
-                    href={location.pathname === "/" ? "#nueva-coleccion" : "/nueva-coleccion"}
-                    onClick={goNuevaColeccion}
-                    className="block py-2 hover:text-accent"
-                  >
-                    {item.label}
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
+          {categories.map((cat) => (
+            <li key={cat.id}>
+              <NavLink
+                to={cat.to || `/${cat.nombre.toLowerCase()}`}
+                onClick={() => setOpen(false)}
+                className="block py-2 hover:text-accent uppercase font-medium"
+              >
+                {cat.nombre}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
       </div>
     </header>
   );

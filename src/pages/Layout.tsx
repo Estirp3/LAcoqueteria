@@ -1,13 +1,15 @@
 import { Outlet } from "react-router-dom";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export default function Layout() {
     return (
-        <div className="min-h-screen bg-white text-ink">
+        <div className="flex flex-col min-h-screen font-sans text-ink bg-[#FDFBF7]">
             <Header />
-            <main className="pt-[72px]">{/* offset de header sticky */}
+            <main className="flex-grow">
                 <Outlet />
             </main>
+            <Footer />
         </div>
     );
 }
